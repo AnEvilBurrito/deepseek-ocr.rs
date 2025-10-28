@@ -95,6 +95,8 @@ impl Default for InferenceSettings {
             crop_mode: true,
             max_new_tokens: 512,
             use_cache: true,
+            gpu_memory_utilization: None,
+            max_num_seqs: None,
         }
     }
 }
