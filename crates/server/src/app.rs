@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use deepseek_ocr_config::{AppConfig, LocalFileSystem};
 use deepseek_ocr_core::{
     model::DeepseekOcrModel,
-    runtime::{default_dtype_for_device, prepare_device_and_dtype},
+    runtime::{default_dtype_for_device, prepare_device_and_dtype_with_options},
 };
 use rocket::{Config, data::ToByteUnit};
 use tokenizers::Tokenizer;
@@ -34,8 +34,16 @@ pub async fn run(args: Args) -> Result<()> {
     let tokenizer_path = ensure_tokenizer_file(&fs, &resources.tokenizer)?;
     let weights_path = prepare_weights_path(&fs, &resources.weights)?;
 
-    let (device, maybe_dtype) =
-        prepare_device_and_dtype(app_config.inference.device, app_config.inference.precision)?;
+    // Read GPU configuration options
+    let gpu_memory_utilization = app_config.inference.gpu_memory_utilization;
+    let max_num_seqs = app_config.inference.max_num_seqs;
+
+    let (device, maybe_dtype) = prepare_device_and_dtype_with_options(
+        app_config.inference.device,
+        app_config.inference.precision,
+        gpu_memory_utilization,
+        max_num_seqs,
+    )?;
     let dtype = maybe_dtype.unwrap_or_else(|| default_dtype_for_device(&device));
 
     let model = DeepseekOcrModel::load(Some(&config_path), Some(&weights_path), device, dtype)

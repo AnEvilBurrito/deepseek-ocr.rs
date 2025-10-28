@@ -51,6 +51,14 @@ pub struct Args {
     #[arg(long, help_heading = "Inference")]
     pub max_new_tokens: Option<usize>,
 
+    /// GPU memory fraction to use for model weights / KV cache (0.0 - 1.0)
+    #[arg(long, help_heading = "Inference")]
+    pub gpu_memory_utilization: Option<f32>,
+
+    /// Maximum number of concurrent sequences/batches the server will accept
+    #[arg(long, help_heading = "Inference")]
+    pub max_num_seqs: Option<usize>,
+
     /// Host/IP for Rocket to bind to.
     #[arg(long, help_heading = "Application")]
     pub host: Option<String>,
@@ -78,6 +86,8 @@ impl From<&Args> for ConfigOverrides {
         overrides.inference.image_size = args.image_size;
         overrides.inference.crop_mode = args.crop_mode;
         overrides.inference.max_new_tokens = args.max_new_tokens;
+        overrides.inference.gpu_memory_utilization = args.gpu_memory_utilization;
+        overrides.inference.max_num_seqs = args.max_num_seqs;
         overrides.server.host = args.host.clone();
         overrides.server.port = args.port;
         overrides.server.model_id = args.model_id.clone();

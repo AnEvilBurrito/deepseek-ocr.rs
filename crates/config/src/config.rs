@@ -78,6 +78,10 @@ pub struct InferenceSettings {
     pub crop_mode: bool,
     pub max_new_tokens: usize,
     pub use_cache: bool,
+    /// Fraction of GPU memory to use for model + cache (0.0 - 1.0)
+    pub gpu_memory_utilization: Option<f32>,
+    /// Maximum number of concurrent sequences/batches
+    pub max_num_seqs: Option<usize>,
 }
 
 impl Default for InferenceSettings {
@@ -244,6 +248,12 @@ impl AppConfig {
         if let Some(use_cache) = overrides.inference.use_cache {
             self.inference.use_cache = use_cache;
         }
+        if overrides.inference.gpu_memory_utilization.is_some() {
+            self.inference.gpu_memory_utilization = overrides.inference.gpu_memory_utilization;
+        }
+        if overrides.inference.max_num_seqs.is_some() {
+            self.inference.max_num_seqs = overrides.inference.max_num_seqs;
+        }
         if let Some(host) = overrides.server.host.as_ref() {
             self.server.host = host.clone();
         }
@@ -372,6 +382,8 @@ pub struct InferenceOverride {
     pub crop_mode: Option<bool>,
     pub max_new_tokens: Option<usize>,
     pub use_cache: Option<bool>,
+    pub gpu_memory_utilization: Option<f32>,
+    pub max_num_seqs: Option<usize>,
 }
 
 #[derive(Debug, Default, Clone)]
